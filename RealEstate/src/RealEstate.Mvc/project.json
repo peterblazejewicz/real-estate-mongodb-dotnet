@@ -30,7 +30,8 @@
     "System.Net.Security": "4.0.0",
     "System.Security.SecureString": "4.0.0",
     "System.Reflection.Emit.Lightweight": "4.0.1",
-    "MongoDB.Driver": "2.3.0-beta1"
+    "MongoDB.Driver": "2.3.0-beta1",
+    "MongoDB.Driver.GridFS": "2.3.0-beta1"
   },
 
   "tools": {
