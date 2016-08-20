@@ -235,3 +235,7 @@ _Pvt_Extensions
 
 # client deps
 wwwroot/lib/
+
+# minified content
+*.min.css
+*.min.js
