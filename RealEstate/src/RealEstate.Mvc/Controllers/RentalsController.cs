@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace RealEstate.Mvc.Controllers
 {
-    public class HomeController : Controller
+    public class RentalsController : Controller
     {
+        // GET: /<controller>/
         public IActionResult Index()
         {
             return View();
