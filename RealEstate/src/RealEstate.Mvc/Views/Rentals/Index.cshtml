@@ -1,5 +1,70 @@
+@model RentalsList
+
 @{
-    ViewBag.Title = "Index Page";
+    ViewBag.Title = "Rental Listings";
 }
 
-<h1>TBD</h1>
+<h2>Rental Listings</h2>
+
+<form asp-controller="Rentals" asp-action="Index" method="post" class="form-inline">
+    <div class="form-group">
+      <label asp-for="Filters.PriceLimit">Price Limit</label>
+      <input asp-for="Filters.PriceLimit" class="form-control">
+    </div>
+    <div class="form-group">
+      <label asp-for="Filters.MinimumRooms">Minimum Rooms</label>
+      <input asp-for="Filters.MinimumRooms" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Description
+            </th>
+            <th>
+                Number Of Rooms
+            </th>
+            <th>
+                Address
+            </th>
+            <th>
+                Price
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+       @foreach (RentalViewModel rental in Model.Rentals)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => rental.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => rental.NumberOfRooms)
+                </td>
+                <td>
+                    @String.Join(" ", rental.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => rental.Price)
+                </td>
+                <td>
+                    <a asp-controller="Rentals" asp-action="AdjustPrice" asp-route-id="rental.Id">Adjust Price</a>
+                </td>
+                <td>
+                    <a asp-controller="Rentals" asp-action="AttachImage" asp-route-id="rental.Id">Image</a>
+                </td>
+                <td>
+                    <a asp-controller="Rentals" asp-action="Delete" asp-route-it="rental.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
