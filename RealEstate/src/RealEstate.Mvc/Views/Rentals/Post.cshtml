@@ -1,0 +1,47 @@
+@model PostRental
+@{ ViewBag.Title = "Post Rental"; }
+
+<h2>Post Rental</h2>
+<form asp-controller="Rentals" asp-action="Post" method="POST" asp-antiforgery="true" class="form form-horizontal">
+  <div asp-validation-summary="All" class="text-danger"></div>
+  <div class="form-group">
+    <label asp-for="Description" class="col-md-2 control-label"></label>
+    <div class="col-md-10">
+      <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label asp-for="NumberOfRooms" class="col-md-2 control-label">Number of Rooms</label>
+    <div class="col-md-10">
+      <input asp-for="NumberOfRooms" class="form-control">
+    </div>
+  </div>
+  <div class="form-group">
+    <label asp-for="Price" class="col-md-2 control-label"></label>
+    <div class="col-md-10">
+      <input class="form-control" asp-for="Price">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-md-2 control-label" asp-for="Address"></label>
+    <div class="col-md-10">
+      <textarea cols="30" rows="5" class="form-control" asp-for="Address"></textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-md-2 control-label" asp-for="ZipCode"></label>
+    <div class="col-md-10">
+      <input class="form-control" asp-for="ZipCode">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+      <button class="btn btn-primary" type="submit">Post</button>
+    </div>
+  </div>
+</form>
+
+
+<div>
+  <a asp-controller="Rentals" asp-action="Index">Back to Rentals</a>
+</div>

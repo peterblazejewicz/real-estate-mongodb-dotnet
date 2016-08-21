@@ -32,6 +32,19 @@ namespace RealEstate.Mvc.Controllers
           return View(model);
         }
 
+        public ActionResult Post()
+        {
+          return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Post(PostRental postRental)
+        {
+          Rental rental = new Rental(postRental);
+          await Context.Rentals.InsertOneAsync(rental);
+          return RedirectToAction("Index");
+        }
+
         public IActionResult Error()
         {
             return View();
