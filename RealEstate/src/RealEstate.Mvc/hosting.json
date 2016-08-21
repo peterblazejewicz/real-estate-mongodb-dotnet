@@ -1,0 +1,6 @@
+{
+  "applicationName": "RealEstate MVC",
+  "environment": "Development",
+  "server.urls": "http://+:5000",
+  "webroot": "wwwroot"
+}

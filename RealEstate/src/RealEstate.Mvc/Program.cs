@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace RealEstate.Mvc
 {
@@ -13,10 +9,11 @@ namespace RealEstate.Mvc
         public static void Main(string[] args)
         {
             var config = new ConfigurationBuilder()
-                .AddCommandLine(args)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("hosting.json", optional: true)
                 .AddEnvironmentVariables(prefix: "ASPNETCORE_")
+                .AddCommandLine(args)
                 .Build();
-
             var host = new WebHostBuilder()
                 .UseConfiguration(config)
                 .UseKestrel()
@@ -24,7 +21,6 @@ namespace RealEstate.Mvc
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
-
             host.Run();
         }
     }
