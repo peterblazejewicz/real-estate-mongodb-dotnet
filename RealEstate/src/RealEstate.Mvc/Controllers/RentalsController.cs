@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using MongoDB.Driver.Linq;
 using RealEstate.Mvc.Model;
 
@@ -32,6 +36,7 @@ namespace RealEstate.Mvc.Controllers
           return View(model);
         }
 
+        [HttpGet]
         public ActionResult Post()
         {
           return View();
@@ -45,11 +50,79 @@ namespace RealEstate.Mvc.Controllers
           return RedirectToAction("Index");
         }
 
+        public ActionResult AdjustPrice(string id)
+        {
+          var rental = GetRental(id);
+          return View(rental);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AdjustPrice(string id,
+          AdjustPrice adjustPrice)
+        {
+            var rental = GetRental(id);
+            rental.AdjustPrice(adjustPrice);
+            await Context.Rentals
+              .ReplaceOneAsync(r => r.Id == id, rental);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Delete(string id)
+        {
+          //Context.Rentals.Remove(Query.EQ("_id", new ObjectId(id)));
+          await Context.Rentals.DeleteOneAsync(r => r.Id == id);
+          return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public string PriceDistribution()
+        {
+          return new QueryPriceDistribution()
+            .RunLinq(Context.Rentals)
+            .ToJson();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AttachImage(string id, ICollection<IFormFile> files)
+        {
+            var rental = GetRental(id);
+            if (rental.HasImage())
+            {
+              await DeleteImageAsync(rental);
+            }
+            var file = files.FirstOrDefault<IFormFile>();
+            await StoreImageAsync(file, id);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public ActionResult GetImage(string id)
+        {
+          try
+          {
+            var stream = Context.ImagesBucket
+              .OpenDownloadStream(new ObjectId(id));
+            var contentType = stream.FileInfo.Metadata["contentType"].AsString;
+            return File(stream, contentType);
+          }
+          catch (GridFSFileNotFoundException)
+          {
+            return NotFound();
+          }
+        }
+
         public IActionResult Error()
         {
             return View();
         }
 
+        private async Task DeleteImageAsync(Rental rental)
+        {
+          await Context.ImagesBucket
+            .DeleteAsync(new ObjectId(rental.ImageId));
+			    await SetRentalImageIdAsync(rental.Id, null);
+        }
         private IMongoQueryable<Rental> FilterRentals(RentalsFilter filters)
         {
             var rentals = Context.Rentals.AsQueryable();
@@ -66,6 +139,34 @@ namespace RealEstate.Mvc.Controllers
                   .Where(r => r.Price <= filters.PriceLimit);
           }
           return rentals;
+        }
+
+        private Rental GetRental(string id)
+        {
+          var rental = Context.Rentals
+            .Find(r => r.Id == id)
+            .FirstOrDefault();
+          return rental;
+        }
+
+        private async Task StoreImageAsync(IFormFile file, string rentalId)
+        {
+          var options = new GridFSUploadOptions
+          {
+            Metadata = new BsonDocument("contentType", file.ContentType)
+          };
+          IGridFSBucket bucket = new GridFSBucket(Context.Database);
+          var imageId = await Context.ImagesBucket
+				    .UploadFromStreamAsync(file.FileName, file.OpenReadStream(), options);
+          await SetRentalImageIdAsync(rentalId, imageId.ToString());
+        }
+
+        private async Task SetRentalImageIdAsync(string rentalId, string imageId)
+        {
+          var setRentalImageId = Builders<Rental>.Update
+            .Set(r => r.ImageId, imageId);
+			    await Context.Rentals
+            .UpdateOneAsync(r => r.Id == rentalId, setRentalImageId);
         }
     }
 }
