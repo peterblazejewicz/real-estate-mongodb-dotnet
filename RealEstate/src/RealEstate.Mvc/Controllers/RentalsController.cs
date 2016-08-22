@@ -71,7 +71,6 @@ namespace RealEstate.Mvc.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(string id)
         {
-          //Context.Rentals.Remove(Query.EQ("_id", new ObjectId(id)));
           await Context.Rentals.DeleteOneAsync(r => r.Id == id);
           return RedirectToAction("Index");
         }

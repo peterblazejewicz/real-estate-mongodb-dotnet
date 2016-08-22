@@ -8,8 +8,9 @@ namespace RealEstate.Mvc
     {
         public RealEstateContext()
         {
-          // @TODO read from configuration
-          var connectionString = "mongodb://127.0.0.1:27017";
+            // @TODO read from configuration
+            var connectionString = "mongodb://127.0.0.1:27017";
+            var settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
             var client = new MongoClient(connectionString);
             Database = client.GetDatabase("realestate");
             ImagesBucket = new GridFSBucket(Database);
