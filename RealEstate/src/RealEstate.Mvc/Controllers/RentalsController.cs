@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using MongoDB.Driver.Linq;
@@ -110,6 +111,40 @@ namespace RealEstate.Mvc.Controllers
           {
             return NotFound();
           }
+        }
+
+        public ActionResult JoinPreLookup()
+        {
+          var rentals = Context.Rentals.Find(new BsonDocument()).ToList();
+          var rentalZips = rentals.Select(r => r.ZipCode).Distinct().ToArray();
+          var zipsById = Context.Database
+            .GetCollection<ZipCode>("zips")
+            .Find(z => rentalZips.Contains(z.Id))
+            .ToList()
+            .ToDictionary(d => d.Id);
+          var report = rentals
+            .Select(r => new
+            {
+              Rental = r,
+              ZipCode = r.ZipCode != null && zipsById.ContainsKey(r.ZipCode)
+                ? zipsById[r.ZipCode] : null
+            });
+
+          return Content(report.ToJson(new MongoDB.Bson.IO.JsonWriterSettings { OutputMode = MongoDB.Bson.IO.JsonOutputMode.Strict}), "application/json");
+        }
+
+        public ActionResult JoinWithLookup()
+        {
+          var report = Context.Rentals
+            .Aggregate()
+            .Lookup<Rental, ZipCode, RentalWithZipCodes>(
+              Context.Database.GetCollection<ZipCode>("zips"),
+              r => r.ZipCode,
+              z => z.Id,
+              w => w.ZipCodes
+            )
+            .ToList();
+          return Content(report.ToJson(new JsonWriterSettings {OutputMode = JsonOutputMode.Strict}), "application/json");
         }
 
         public IActionResult Error()
