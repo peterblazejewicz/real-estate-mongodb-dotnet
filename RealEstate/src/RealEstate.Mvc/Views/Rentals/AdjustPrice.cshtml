@@ -1,0 +1,12 @@
+@model RealEstate.Mvc.Model.Rental
+@{
+    ViewBag.Title = "Adjust Price";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form asp-controller="Rentals" asp-action="AdjustPrice" method="POST" asp-antiforgery="true" class="form form-horizontal">
+  <div class="form-group">
+    <label asp-for="@Model.Description" class="control-label col-md-2"></label>
+  </div>
+</form>
