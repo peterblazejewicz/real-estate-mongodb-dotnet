@@ -55,13 +55,13 @@
                     @Html.DisplayFor(modelItem => rental.Price)
                 </td>
                 <td>
-                    <a asp-controller="Rentals" asp-action="AdjustPrice" asp-route-id="rental.Id">Adjust Price</a>
+                    <a asp-controller="Rentals" asp-action="AdjustPrice" asp-route-id="@rental.Id">Adjust Price</a>
                 </td>
                 <td>
-                    <a asp-controller="Rentals" asp-action="AttachImage" asp-route-id="rental.Id">Image</a>
+                    <a asp-controller="Rentals" asp-action="AttachImage" asp-route-id="@rental.Id">Image</a>
                 </td>
                 <td>
-                    <a asp-controller="Rentals" asp-action="Delete" asp-route-it="rental.Id">Delete</a>
+                    <a asp-controller="Rentals" asp-action="Delete" asp-route-id="@rental.Id">Delete</a>
                 </td>
             </tr>
         }
