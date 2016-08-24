@@ -53,18 +53,25 @@ namespace RealEstate.Mvc.Controllers
 
         public ActionResult AdjustPrice(string id)
         {
-          var rental = GetRental(id);
-          return View(rental);
+          return View(new AdjustPriceViewModel{
+            Rental = GetRental(id),
+            AdjustPrice = new AdjustPrice()
+          });
+          var model = new AdjustPriceViewModel
+          {
+            Rental = GetRental(id)
+          };
+          return View(model);
         }
 
         [HttpPost]
-        public async Task<ActionResult> AdjustPrice(string id,
-          AdjustPrice adjustPrice)
+        public async Task<ActionResult> AdjustPrice(
+          AdjustPriceViewModel adjustPriceViewModel)
         {
-            var rental = GetRental(id);
-            rental.AdjustPrice(adjustPrice);
+            var rental = GetRental(adjustPriceViewModel.Rental.Id);
+            rental.AdjustPrice(adjustPriceViewModel.AdjustPrice);
             await Context.Rentals
-              .ReplaceOneAsync(r => r.Id == id, rental);
+              .ReplaceOneAsync(r => r.Id == adjustPriceViewModel.Rental.Id, rental);
             return RedirectToAction("Index");
         }
 
